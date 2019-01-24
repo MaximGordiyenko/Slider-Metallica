@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Slider</title>
+    <style>
+        .slider {
+            text-align: center;
+        }
+        
+        .slider-content {
+            display: inline-block;
+            position: relative;
+        }
+        
+        .slider-content img:selected {
+            background-color: transparent;
+        }
+        
+        .slider-content img {
+            display: none;
+            outline: none;
+        }
+        
+        .radio-buttons {
+            position: absolute;
+            bottom: 5px;
+            left: 0;
+            right: 0;
+            margin-right: auto;
+            margin-left: auto;
+        }
+        /*доступ к атрибутам кнопки типа радио*/
+        .radio-buttons input[type=radio] {
+            display: none;
+        }
+        
+        .radio-buttons input[type=radio] + span {
+            width: 12px;
+            height: 12px;
+            display: inline-block;
+            border-radius: 50%;
+            background-color: #eee;
+            margin: 0 5px;
+            cursor: pointer;
+        }
+        /*span который отмечный*/
+        .radio-buttons input[type=radio]:checked + span {
+            background-color: olivedrab;
+        }
+        
+        .prev-image, .next-image {
+            position: absolute;
+            width: 50px;
+            height: 100%;
+            background-color: rgba(51, 51, 51, 0);
+            top: 0;
+        }
+        
+        .prev-image:hover, .next-image:hover {
+            background-color: rgba(51, 51, 51, 0.4);
+        }
+        
+        .prev-image {
+            left: 0;
+        }
+        
+        .next-image {
+            right: 0;
+        }
+    </style>
+</head>
+<body>
+<div class="slider">
+    <div class="slider-content">
+        <img src="img/met1.jpg" alt="">
+        <img src="img/met2.jpg" alt="">
+        <img src="img/met6.jpg" alt="">
+        <img src="img/met7.jpg" alt="">
+        
+        <div class="radio-buttons"></div>
+        <div class="prev-image"></div>
+        <div class="next-image"></div>
+    </div>
+
+</div>
+
+<script>
+    let sliderContent = document.querySelector(".slider-content");
+    //хранится колекция NodeList
+    let images = document.querySelectorAll(".slider-content > img");
+    // такая запись .slider .radio-buttons как бы гарантирует что найдется то что указали
+    let radioContent = document.querySelector(".slider .radio-buttons");
+    //Глобальная переменая
+    let current = 0;
+
+    images.forEach(function (elem, index) {
+        //создать елемент label tag
+        let label = document.createElement("label");
+        //создать елемент input tag
+        let input = document.createElement("input");
+        //создать елемент span tag
+        let span = document.createElement("span");
+
+        //повесить событие на checkbox - изменить картинку при нажатии
+        input.addEventListener('click', function () {
+            //при нажатии отбразить индекс
+            setCurrentImage(index);
+        }, false);
+        //input по умолчанию text и выяглядит прямоугольником
+        input.setAttribute("type", "radio");
+        // что бы все были не отмечены дадим всем одно имя как бы в одной групе
+        input.setAttribute("name", "radio-buttons");
+        //присоеденить input к label tag
+
+        label.appendChild(input);
+        //присоеденить span к label
+
+        label.appendChild(span);
+        //добавляем к кнопке radioContent и вкладываем в input и в label
+        radioContent.appendChild(label);
+    });
+    //Поиск все созданых инпутов
+    let inputs = document.querySelectorAll(".radio-buttons input");
+    //вязть текущий инпут и отметить его так как по умолчанию он false
+    inputs[current].checked = true;
+    
+    //Сначала ищется локальная перемення а потом глобальная
+    function setCurrentImage(index) { //локальная переменная index
+        //проходимся по всем изображениям и делвем их не видимими
+        current = index;
+        images.forEach(e => e.style.display = 'none');
+        inputs.forEach(e => e.checked = false);
+        images[current].style.display = "block";
+        inputs[current].checked = true;
+    }
+
+    // ЛКМ
+    sliderContent.addEventListener('click', function (e) {
+        if (e.target.localName === 'img') {
+            current = current === 0 ? images.length - 1 : current - 1;
+            setCurrentImage(current);
+        }
+    }, false);
+    
+    // ПКМ
+    sliderContent.addEventListener('contextmenu', function (e) {
+        e.preventDefault();
+        if (e.target.localName === 'img') {
+            //если текущее равно последенему елементу тогда перейти вначало
+            current = current === images.length - 1 ? 0 : current + 1;
+            setCurrentImage(current);
+        }
+    }, false);
+
+    // Колесико
+    sliderContent.addEventListener('wheel', function (e) {
+        e.preventDefault();
+        if (e.deltaY > 0) {
+            current = current === 0 ? images.length - 1 : current - 1;
+            setCurrentImage(current);
+        } else {
+            current = current === images.length - 1 ? 0 : current + 1;
+            setCurrentImage(current);
+        }
+    }, false);
+
+    // Кнопки на изображении
+    sliderContent.addEventListener('click', function (e) {
+        if (e.target.className === 'prev-image') {
+            current = current === 0 ? images.length - 1 : current - 1;
+            setCurrentImage(current);
+        }
+    }, false);
+    sliderContent.addEventListener('click', function (e) {
+        if (e.target.className === 'next-image') {
+            current = current === images.length - 1 ? 0 : current + 1;
+            setCurrentImage(current);
+        }
+    }, false);
+    //в стилях все изображения по умолчанию не видно кроме текущего
+    // images[current].style.display = "block";
+    //функцией мы заменяем строчку выше как бы она делает тоже самое
+    setCurrentImage(current);
+</script>
+</body>
+</html>
