@@ -1,1 +1,1 @@
-![](metal)
+![](metal.gif)
